@@ -8,10 +8,10 @@ import {renderView} from '../components/render';
 import * as backend from '../build/index.main.js';
 import {loadStdlib} from '@reach-sh/stdlib';
 import dynamic from "next/dynamic"
-// import MyAlgoConnect from '@reach-sh/stdlib/ALGO_MyAlgoConnect'
-const MyAlgoConnect = dynamic(() => import('@reach-sh/stdlib/ALGO_MyAlgoConnect'), {
-  ssr: false
-});
+import MyAlgoConnect from '@reach-sh/stdlib/ALGO_MyAlgoConnect'
+// const MyAlgoConnect = dynamic(() => import('@reach-sh/stdlib/ALGO_MyAlgoConnect'), {
+//   ssr: false
+// });
 
 const reach = loadStdlib(process.env);
 reach.setWalletFallback(reach.walletFallback({
