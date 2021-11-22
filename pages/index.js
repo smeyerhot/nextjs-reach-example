@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AppViews from '../components/AppViews';
 import DeployerViews from '../components/DeployerViews';
 import AttacherViews from '../components/AttacherViews';
@@ -8,14 +8,11 @@ import {renderView} from '../components/render';
 import * as backend from '../build/index.main.js';
 import {loadStdlib} from '@reach-sh/stdlib';
 import dynamic from "next/dynamic"
-import MyAlgoConnect from '@reach-sh/stdlib/ALGO_MyAlgoConnect'
-// const MyAlgoConnect = dynamic(() => import('@reach-sh/stdlib/ALGO_MyAlgoConnect'), {
-//   ssr: false
-// });
-
+const MyAlgoConnect = dynamic(() => import('@reach-sh/stdlib/ALGO_MyAlgoConnect'), {
+  ssr: false
+});
+// import MyAlgoConnect from '@reach-sh/stdlib/ALGO_MyAlgoConnect'
 const reach = loadStdlib(process.env);
-reach.setWalletFallback(reach.walletFallback({
-  providerEnv: 'TestNet', MyAlgoConnect }));
 const handToInt = {'ROCK': 0, 'PAPER': 1, 'SCISSORS': 2};
 const intToOutcome = ['Bob wins!', 'Draw!', 'Alice wins!'];
 const {standardUnit} = reach;
@@ -28,10 +25,8 @@ export default function Home() {
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <main>
        <MyApp/>
-      </main>
+       <Page/>
       <style jsx>{`
       body {
         margin: 0;
@@ -98,6 +93,9 @@ class MyApp extends React.Component {
     this.state = {view: 'ConnectAccount', ...defaults};
   }
   async componentDidMount() {
+    
+    reach.setWalletFallback(reach.walletFallback({
+      providerEnv: 'TestNet', MyAlgoConnect }));
     const acc = await reach.getDefaultAccount();
     const balAtomic = await reach.balanceOf(acc);
     const bal = reach.formatCurrency(balAtomic, 4);
@@ -171,5 +169,10 @@ class Attacher extends Player {
   }
   render() { return renderView(this, AttacherViews); }
 }
-
+function Page() {
+  useEffect(() => {
+    console.log(window)
+  })
+  return (<div>Hello</div>)
+}
 
