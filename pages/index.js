@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AppViews from '../components/AppViews';
 import DeployerViews from '../components/DeployerViews';
 import AttacherViews from '../components/AttacherViews';
@@ -8,25 +8,41 @@ import {renderView} from '../components/render';
 import * as backend from '../build/index.main.js';
 import {loadStdlib} from '@reach-sh/stdlib';
 import dynamic from "next/dynamic"
-const MyAlgoConnect = dynamic(() => import('@reach-sh/stdlib/ALGO_MyAlgoConnect'), {
-  ssr: false
-});
-// import MyAlgoConnect from '@reach-sh/stdlib/ALGO_MyAlgoConnect'
-const reach = loadStdlib(process.env);
-const handToInt = {'ROCK': 0, 'PAPER': 1, 'SCISSORS': 2};
-const intToOutcome = ['Bob wins!', 'Draw!', 'Alice wins!'];
-const {standardUnit} = reach;
-const defaults = {defaultFundAmt: '10', defaultWager: '3', standardUnit};
+// const MyAlgoConnect = dynamic(() => import('@reach-sh/stdlib/ALGO_MyAlgoConnect'), {
+//   ssr: false
+// });
+
+import MyAlgoConnect from '@reach-sh/stdlib/ALGO_MyAlgoConnect'
 
 export default function Home() {
+  // let reach = useRef('')
+  const [view, setView] = useState('Hello')
+  const reach = loadStdlib({
+    REACH_CONNECTOR_MODE: process.env.NEXT_PUBLIC_REACH_CONNECTOR_MODE,
+  });
+  useEffect(() => {
+    reach.setWalletFallback(reach.walletFallback({
+      providerEnv: 'TestNet', MyAlgoConnect 
+    }));
+    setView("Goodbye")
+  },[])
+  console.log(reach)
+
+  const handToInt = {'ROCK': 0, 'PAPER': 1, 'SCISSORS': 2};
+  const intToOutcome = ['Bob wins!', 'Draw!', 'Alice wins!'];
+  const {standardUnit} = reach;
+  const defaults = {defaultFundAmt: '10', defaultWager: '3', standardUnit};
   return (
     <div className="container">
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-       <MyApp/>
+      <main>
+       <MyApp defaults={defaults}/>
+       {view}
        <Page/>
+       </main>
       <style jsx>{`
       body {
         margin: 0;
@@ -90,12 +106,10 @@ export default function Home() {
 class MyApp extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {view: 'ConnectAccount', ...defaults};
+    this.state = {view: 'ConnectAccount', ...props.defaults};
   }
   async componentDidMount() {
-    
-    reach.setWalletFallback(reach.walletFallback({
-      providerEnv: 'TestNet', MyAlgoConnect }));
+
     const acc = await reach.getDefaultAccount();
     const balAtomic = await reach.balanceOf(acc);
     const bal = reach.formatCurrency(balAtomic, 4);
