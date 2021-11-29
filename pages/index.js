@@ -8,30 +8,26 @@ import {renderView} from '../components/render';
 import * as backend from '../build/index.main.js';
 import {loadStdlib} from '@reach-sh/stdlib';
 import dynamic from "next/dynamic"
-// const MyAlgoConnect = dynamic(() => import('@reach-sh/stdlib/ALGO_MyAlgoConnect'), {
-//   ssr: false
-// });
 
-import MyAlgoConnect from '@reach-sh/stdlib/ALGO_MyAlgoConnect'
+const AlgoWrapper = dynamic(()=> import("../components/algo"), { ssr: false });
+const reach = loadStdlib({
+  REACH_CONNECTOR_MODE: process.env.NEXT_PUBLIC_REACH_CONNECTOR_MODE,
+});
+reach.setWalletFallback(reach.walletFallback({
+      providerEnv: 'TestNet', AlgoWrapper
+    }));
 
+const handToInt = {'ROCK': 0, 'PAPER': 1, 'SCISSORS': 2};
+const intToOutcome = ['Bob wins!', 'Draw!', 'Alice wins!'];
+const {standardUnit} = reach;
+const defaults = {defaultFundAmt: '10', defaultWager: '3', standardUnit};
 export default function Home() {
   // let reach = useRef('')
   const [view, setView] = useState('Hello')
-  const reach = loadStdlib({
-    REACH_CONNECTOR_MODE: process.env.NEXT_PUBLIC_REACH_CONNECTOR_MODE,
-  });
   useEffect(() => {
-    reach.setWalletFallback(reach.walletFallback({
-      providerEnv: 'TestNet', MyAlgoConnect 
-    }));
     setView("Goodbye")
   },[])
-  console.log(reach)
-
-  const handToInt = {'ROCK': 0, 'PAPER': 1, 'SCISSORS': 2};
-  const intToOutcome = ['Bob wins!', 'Draw!', 'Alice wins!'];
-  const {standardUnit} = reach;
-  const defaults = {defaultFundAmt: '10', defaultWager: '3', standardUnit};
+  console.log(view)
   return (
     <div className="container">
       <Head>
@@ -40,6 +36,7 @@ export default function Home() {
       </Head>
       <main>
        <MyApp defaults={defaults}/>
+       <AlgoWrapper />
        {view}
        <Page/>
        </main>
@@ -185,7 +182,7 @@ class Attacher extends Player {
 }
 function Page() {
   useEffect(() => {
-    console.log(window)
+    // console.log(window)
   })
   return (<div>Hello</div>)
 }
